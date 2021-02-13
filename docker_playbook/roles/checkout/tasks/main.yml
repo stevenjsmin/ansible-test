@@ -1,0 +1,23 @@
+---
+
+# Set role specific variables
+- include: '{{ playbook_dir }}/roles/checkout/prereqs/params.yml'
+
+- name: Checkout from Git
+  block:
+    - debug: msg="Cleanup exsiting git repo codes on {{WORKING_DIR}}/{{GIT_REPO_NAME}}"
+    - file:
+        state: absent
+        path: "{{WORKING_DIR}}/{{GIT_REPO_NAME}}"
+
+    - debug: msg="Create directory {{WORKING_DIR}}"
+    - file:
+        state: directory
+        path: "{{WORKING_DIR}}"
+
+    - debug: msg="Check out code on {{ WORKING_DIR }}"
+    - shell: "git clone -b {{GIT_CHECKOUT_BRANCH}} {{GIT_BASE_URL}}/{{GIT_REPO_NAME}}.git"
+      args:
+        warn: false
+        chdir: "{{WORKING_DIR}}"
+      ignore_errors: yes

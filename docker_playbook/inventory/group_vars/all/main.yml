@@ -1,0 +1,38 @@
+---
+
+# Set default Git parameters
+GIT_BASE_URL: "ssh://git@bitbucket.service.anz/cdp"
+GIT_CHECKOUT_BRANCH: "develop"
+
+# Set temporary working directory that will be used for any processing
+# For example, checkout codes, compiles codes, log files, packaged files etc...
+#WORKING_DIR: "{{ playbook_dir | dirname }}/out/{{ MODULE }}/{{ BUILD_VER }}"
+WORKING_DIR: "{{ playbook_dir | dirname }}"
+
+# Set connection information for Docker private registry
+artifact_svr_host:    "artifactory.service.anz"
+artifact_svr_port:    "8021"
+artifact_repo_group:  "cdp-poc"
+
+ARTIFACT_REPO_URL:    "{{artifact_svr_host}}:{{artifact_svr_port}}/{{artifact_repo_group}}"
+
+# Below variable should be temporary, later it need to move to outside as parameter
+WORKSPACE: "/root/.jenkins/workspace"
+
+# Set email server to notify via email protocol
+smtp:
+  server: "smtp.anz.com"
+  user_id: "xxxx"
+  user_pwd: "xxxx"
+
+
+# Define Openshift resources
+openshift_cdp_nameSpace: "cdp-environment-blue"
+openshift_cdp_baseUrl:   "ose.cpaas.service.test"
+openshift_cdp_port:      "8443"
+openshift_cdp_ver:       "1.8"
+
+
+
+
+

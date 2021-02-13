@@ -1,0 +1,4 @@
+#{{ date_time }}
+ConnectPlusUniqueIdSequence={{ connect_plus_unique_id_sequence }}
+ConnectPlusUniqueIdPrefix={{ connect_plus_unique_id_prefix }}
+ConnectPlusUniqueIdSequenceMax=99999999999

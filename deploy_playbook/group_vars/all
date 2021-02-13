@@ -1,0 +1,20 @@
+---
+# file: group_vars/all
+#
+# group_vars file
+#
+
+experian_directory: /opt/Experian
+powercurve_directory: "{{ experian_directory }}/PowerCurve"
+installation_temp_directory: "{{ experian_directory }}/install"
+backup_directory: "{{ experian_directory }}/Backup"
+
+git_repo_directory: "{{ experian_directory }}/repos"
+
+artifactory_url: https://artifactory.service.anz
+artifactory_repository: CDP
+
+python_path: /opt/Experian/PowerCurve/python-3.6.10/bin/python3.6
+java_home: /opt/Experian/PowerCurve/jdk1.8.0_171
+jre_home: /opt/Experian/PowerCurve/jdk1.8.0_171/jre
+

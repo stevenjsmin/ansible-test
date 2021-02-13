@@ -1,0 +1,23 @@
+<html>
+<body>
+
+<div style="color: 3B3B3B">
+</br>
+Dear <b>{{ USER_NAME|list|join() }}</b>,</br>
+</br>
+This email is the result of Loadtest. [REQUEST ID : {{ REQUEST_ID }}]</br></br>
+After downloading on following link and decompressing it, you can check the Loadtest result in the form of HTML.</br>
+Download link : <a href="https://apro.nbnco.net.au/apn-generic/load-test-result/{{ REQUEST_ID }}/Appian_LOADTEST_{{ APP_MODULE }}.zip">{{ LOADTEST_RESULT_FILE }}</a></br>
+</br>
+<b>Application module: <font color=FF5546>{{ APP_MODULE }}</font></b></br>
+<b>Attachment name: </b><font color=AD4851>{{ LOADTEST_RESULT_FILE }}</font></br>
+<b>Test run time:</b> <font color=2C446B>{{ LOADTEST_START_TIME }} ~ {{ LOADTEST_END_TIME }}</font></br>
+
+</br></br>
+Thank you.</br>
+</br></br>
+Appian System Team</br>
+<font size=2 color=76ADB6>Level 39, 360 Elizabeth Street, Melbourne VIC 3000</font></br>
+</div>
+</body>
+</html>

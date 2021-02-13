@@ -1,0 +1,6 @@
+---
+# Other variables for the role
+#       For more detail please check https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#playbooks-variables
+
+
+test_ping: "Pong:: I love Australia"

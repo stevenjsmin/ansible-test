@@ -1,0 +1,10 @@
+---
+
+- name: Managing Openshift Resources
+  hosts: "localhost"
+  roles:
+    - { role: common }
+    - { role: openshift_resource }
+
+  vars_files:
+    - "{{ inventory_dir }}/group_vars/{{ MODULE }}/main.yml"

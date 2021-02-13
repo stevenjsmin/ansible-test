@@ -1,0 +1,10 @@
+---
+
+- name: Clean up temporary file
+  hosts: "localhost"
+  roles:
+    - { role: common }
+    - { role: cleanup }
+
+  vars_files:
+    - "{{ inventory_dir }}/group_vars/{{ MODULE }}/main.yml"

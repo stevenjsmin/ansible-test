@@ -1,0 +1,37 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: "cdp-{{ MODULE | lower }}-imageStream-template"
+objects:
+  - kind: ImageStream
+    apiVersion: v1
+    metadata:
+      name: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+      annotations:
+        description: "{{ MODULE | upper }} on {{ cdp.module_type }} mode"
+      labels:
+        app: "{{ MODULE | lower }}-pco"
+        cdp-ver: "{{ cdp.software_ver }}"
+        cdp-app_ver: "{{ cdp.software_ver }}"
+        app-type: "{{ cdp.module_type }}"
+        {{ MODULE | lower }}-docker: "{{ DOCKER_VER }}"
+    spec:
+      tags:
+        - annotations: null
+          from:
+            kind: DockerImage
+{% if MODULE == "OpenAM" %}
+            name: "artifactory.service.anz:8021/cdp-poc/{{ MODULE | lower }}-pco:{{ DOCKER_VER }}"
+{% else %}
+            name: "artifactory.service.anz:8021/cdp-poc/{{ MODULE | lower }}-pco/runtime:{{ DOCKER_VER }}"
+{% endif %}
+          importPolicy:
+            insecure: true
+          name: latest
+
+
+
+
+
+
+

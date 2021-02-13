@@ -1,0 +1,20 @@
+# Check repository whether or not it has already been cloned locally.
+#- git:
+#    repo: ssh://git@bitbucket.service.anz/cdp/ci_scripts.git
+#    dest: {{ git_repo_directory }}
+#    clone: no
+#    update: no
+
+- name: Set SSL false
+  shell: "git config --global http.sslVerify false"
+
+# Clone the repository
+- name: "Clone repository into {{ dest_repo }}"
+  git:
+    repo: "{{ git_repo_url }}" 
+    version: "{{ branch }}"
+    dest: "{{ dest_repo }}"
+    update: yes
+    accept_hostkey: yes
+  # ssh-agent doesn't allow key to pass through remote sudo commands.
+  become: no

@@ -1,0 +1,12 @@
+# this is the default ansible 'hosts' file.
+#
+# it should live in /etc/ansible/hosts
+#
+#   - comments begin with the '#' character
+#   - blank lines are ignored
+#   - groups of hosts are delimited by [header] elements
+#   - you can enter hostnames or ip addresses
+#   - a hostname/ip can be a member of multiple groups
+
+# localhost
+localhost ansible_connection=local

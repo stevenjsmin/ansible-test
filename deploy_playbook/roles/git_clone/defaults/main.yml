@@ -1,0 +1,3 @@
+git_repo_url: "https://{{ github_user | urlencode }}:{{ github_password | urlencode }}@bitbucket.service.anz/scm/cdp/ci_scripts.git"
+branch: "feature/poc-for-linux"
+dest_repo: "{{ git_repo_directory }}/ci_scripts"

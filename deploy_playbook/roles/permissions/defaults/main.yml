@@ -1,0 +1,14 @@
+---
+# defaults file for permissions
+
+read_access_directories:
+  - "{{ experian_directory }}/BPS_Solution"
+  - "{{ experian_directory }}/BPS_Solution/Business_Process_Engine"
+  - "{{ experian_directory }}/BPS_Solution/Business_Process_Engine/Log"
+  - "{{ experian_directory }}/Connectivity_Solution/logs"
+  - "{{ powercurve_directory }}"
+  - "{{ powercurve_directory }}/business-process-server-v{{ bps_version }}/logs"
+  - "{{ powercurve_directory }}/business-process-server-v{{ bps_version }}/wrapper"
+  - "{{ powercurve_directory }}/Web\ Engine/logs"
+  - "{{ powercurve_directory }}/apache-tomcat-{{ tomcat_version }}/logs"
+

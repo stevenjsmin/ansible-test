@@ -1,0 +1,16 @@
+---
+
+- name: "Set NewRelic Appication name"
+  set_fact:
+    newrelic_apm_appname: "{{ hostvars[inventory_hostname]['newrelic_apm_appname'] | default('') }}"
+  tags:
+    - newrelic
+    - always
+
+- name: Check newrelic-infra agent
+  include: agent-infra.yml
+  when: newrelic_apm_appname != ''
+  tags:
+    - newrelic
+    - always
+

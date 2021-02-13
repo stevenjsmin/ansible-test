@@ -1,0 +1,71 @@
+---
+
+# Define role specific variables
+- name: Set environment ACTION
+  set_fact:
+    ACTION: "build"
+  when: ACTION is undefined or ACTION is none
+
+
+- name: Set environment DOCKERFILE
+  set_fact:
+    DOCKERFILE: "Dockerfile"
+  when: DOCKERFILE is undefined or DOCKERFILE is none
+
+- name: Set environment Module level
+  set_fact:
+    MODULE_LEVEL: "runTime"
+  when: MODULE_LEVEL is undefined or MODULE_LEVEL is none
+
+- name: Set environment ARTIFACT_REPO_URL
+  set_fact:
+    ARTIFACT_REPO_URL: "artifactory.service.anz:8021/cdp-poc"
+  when: ARTIFACT_REPO_URL is undefined or ARTIFACT_REPO_URL is none
+
+
+- name: Set environment BPS_MODULE
+  set_fact:
+    BPS_MODULE: "pco"
+  when: BPS_MODULE is undefined or BPS_MODULE is none
+
+
+- name: Set environment CREATE_LATEST_TAG
+  set_fact:
+    CREATE_LATEST_TAG: "no"
+  when: CREATE_LATEST_TAG is undefined or CREATE_LATEST_TAG is none
+
+
+#- name: Set Docker image full image url
+#  set_fact:
+#    DOCKER_IMG_URL: "{{ARTIFACT_REPO_URL}}/{{MODULE | lower}}-{{MODULE_TYPE}}"
+
+- name: Set Docker image full image url
+  set_fact:
+    DOCKER_IMG_URL: "{{ARTIFACT_REPO_URL}}/{{MODULE | lower}}-{{MODULE_TYPE}}/{{MODULE_LEVEL | lower}}"
+  when: MODULE != 'OpenAM'
+
+- name: Set Docker image full image url
+  set_fact:
+    DOCKER_IMG_URL: "{{ARTIFACT_REPO_URL}}/{{MODULE | lower}}-{{MODULE_TYPE}}"
+  when: MODULE == 'OpenAM'
+
+
+- name: Set environment DOCKER_IMG_PUSH
+  set_fact:
+    DOCKER_IMG_PUSH: no
+  when: DOCKER_IMG_PUSH is undefined or DOCKER_IMG_PUSH is none
+
+# Make sure the variables values
+- assert:
+    that:
+      - item is defined
+      - item is not none
+      - ( item | trim != '' )
+    msg: "FAILED: Missing environment variables"
+  with_items:
+    - "{{ DOCKERFILE }}"
+    - "{{ ARTIFACT_REPO_URL }}"
+    - "{{ MODULE_TYPE }}"
+    - "{{ DOCKER_IMG_URL }}"
+    - "{{ DOCKER_IMG_PUSH }}"
+

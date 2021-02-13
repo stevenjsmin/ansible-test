@@ -1,0 +1,39 @@
+---
+# tasks file for newrelic
+
+# Prepare directory for NewRelic Infrastructure agent application
+- name: Check if NewRelic Infra application directory exists
+  stat:
+    path: "{{ newrelic_infra_home }}"
+  register: is_dir_exist
+  tags:
+    - newrelic
+    - always
+
+- name: Check if newrelic-infra is running
+  shell: pgrep newrelic-infra
+  ignore_errors: yes
+  changed_when: false
+  register: service_newrelic_infra_status
+  tags:
+    - newrelic
+    - always
+
+- name: Clean up the newrelic-infra.pid file
+  file:
+    path: '{{ newrelic_home }}/newrelic-infra/var/run/newrelic-infra/newrelic-infra.pid'
+    state: absent
+  when: service_newrelic_infra_status.rc != 0 and is_dir_exist.stat.exists
+  tags:
+    - newrelic
+    - always
+
+- name: Start newrelic-infra agent
+  shell: "nohup ./usr/bin/newrelic-infra -config={{ newrelic_infra_home }}/etc/newrelic-infra.yml > {{ newrelic_infra_home }}/newrelic-infra.log 2>&1 &"
+  args:
+    chdir: "{{ newrelic_infra_home }}"
+  when: service_newrelic_infra_status.rc != 0
+  tags:
+    - newrelic
+    - always
+

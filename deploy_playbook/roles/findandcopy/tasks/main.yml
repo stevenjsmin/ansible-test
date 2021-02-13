@@ -1,0 +1,23 @@
+---
+
+- debug: var=file_path
+
+# Find list of required files
+- name: find required files
+  find:
+    paths: "{{ file_path }}"
+    use_regex: yes
+    patterns: "{{regex_pattern}}"
+  register: file_list
+
+- debug: var=file_list
+
+# Copy the obtained files to required destination
+- name: Copy Files
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ destination_directory }}"
+    remote_src: yes
+    mode: 0600
+  loop: "{{ file_list.files }}"
+  when: file_list is defined

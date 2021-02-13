@@ -1,0 +1,50 @@
+---
+
+
+- name: Include solution and script files
+  include: '{{ playbook_dir }}/roles/build_docker/tasks/copySolutionScriptFiles.yml'
+  when: MODULE == 'BPS' or MODULE == 'Connectivity'
+
+
+- debug: var=MODULE
+
+- name: Bake image
+  block:
+    - debug: msg="Build Docker image for BPS || MODULE || Connectivity || WE"
+    - docker_image:
+        name: "{{DOCKER_IMG_URL}}"
+        tag: "{{BUILD_VER}}"
+        build:
+          dockerfile: "{{DOCKERFILE}}"
+          path: "{{WORKING_DIR}}/ci_docker/Images/{{MODULE}}/runtimeImage"
+          args:
+            BPS_MODULE: "{{MODULE_TYPE}}"
+            dbpdm_md5sum: "{{dbpdm_md5sum}}"
+            gitId_cdp: "{{gitId_cdp}}"
+        push: "{{DOCKER_IMG_PUSH}}"
+        source: build
+      when: MODULE == 'BPS' or MODULE == 'Connectivity' or MODULE == 'WE'
+
+    - debug: msg="Build Docker image for OpenAM"
+    - docker_image:
+        name: "{{DOCKER_IMG_URL}}"
+        tag: "{{BUILD_VER}}"
+        build:
+          dockerfile: "{{DOCKERFILE}}"
+          path: "{{WORKING_DIR}}/ci_docker/Images/{{MODULE}}"
+          args:
+            BPS_MODULE: "{{MODULE_TYPE}}"
+            dbpdm_md5sum: "{{dbpdm_md5sum}}"
+            gitId_cdp: "{{gitId_cdp}}"
+        push: "{{DOCKER_IMG_PUSH}}"
+        source: build
+      when: MODULE == 'OpenAM'
+
+    - debug: msg="Add tag latest to image"
+    - docker_image:
+        name: "{{DOCKER_IMG_URL}}:{{BUILD_VER}}"
+        repository: "{{DOCKER_IMG_URL}}:latest"
+        force_tag: yes
+        push: "{{DOCKER_IMG_PUSH}}"
+        source: local
+      when: CREATE_LATEST_TAG == "yes"

@@ -1,0 +1,6 @@
+---
+
+- name: Managing jFrog Artifacts
+  hosts: "localhost"
+  roles:
+    - { role: artifact_manage }

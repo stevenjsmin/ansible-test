@@ -1,0 +1,11 @@
+---
+
+- name: Clean up {{WORKING_DIR}}
+  file:
+    state: absent
+    path: "{{WORKING_DIR}}"
+  ignore_errors: yes
+  register: cleanupStatus
+
+- debug: var=cleanupStatus
+

@@ -1,0 +1,99 @@
+---
+
+- name: Install Python modules
+  include_role:
+    name: install_python_module
+  vars:
+    python_module: "{{ item }}"
+  with_items: "{{ python_modules }}"
+  tags:
+    - vault
+    - packaging
+    - bps
+    - connectivity
+
+# Prepare directory required for playbook execution and re-adjust ariable values in case of PROD environment
+- name: Prepare Vault environment & Download secret id info
+  block:
+    # Create vault directory if it does not exist
+    - file:
+        path: "{{ powercurve_directory }}/key/vault"
+        state: directory
+        recurse: yes
+    # Check default values, if prod adjust for prod environment
+    - set_fact:
+        vault_env: "{{ vault_prod_env }}"
+        vault_host: "{{ vault_prod_host }}"
+        vault_dp_sa: "{{ vault_prod_dp_sa }}"
+        vault_role_id: "{{ vault_prod_role_id }}"
+      when: '(node_name is defined and "PROD" in node_name) or (node_name is defined and "DR" in node_name)'
+  tags:
+    - vault
+    - packaging
+    - bps
+    - connectivity
+
+# If the server does not have the key and certificate required to access HashiCorp Vault through Datapower, install it on the server first.
+- name: Check cert and key file for Datapower
+  include: check_keycert.yml
+  tags:
+    - vault
+    - packaging
+    - bps
+    - connectivity
+
+- name: Checkout(download) secret zip and extract SECRET_ID from Artifactory
+  include: download_secret_zip.yml
+  tags:
+    - vault
+    - packaging
+    - bps
+    - connectivity
+
+
+- name: If current date exceeds the date to be updated, the try to re-generate secret_id.
+  include: regenerate_secret_id.yml
+  vars:
+    vault_secret_id: "{{ secret_id.stdout }}"
+  tags:
+    - vault
+    - packaging
+    - bps
+    - connectivity
+
+
+- name: Checkout secret files
+  include: checkout_password_files.yml
+  vars:
+    vault_secret_id: "{{ secret_id.stdout }}"
+  with_items:
+    - "{{ lookup('vars', 'vault_' + vault_env + '_bps_secret_files') }}"
+    - "{{ lookup('vars', 'vault_' + vault_env + '_connectivity_' + module + '_secret_files') }}"
+  loop_control:
+    loop_var: outer_item
+  tags:
+     - vault
+     - packaging
+     - bps
+     - connectivity
+
+
+- name: Cleanup temp files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ powercurve_directory }}/key/vault/secret_id.zip"
+    - "{{ powercurve_directory }}/key/vault/secret_id.info.json"
+    - "{{ powercurve_directory }}/key/vault/secret_id.meta.json"
+    - "{{ powercurve_directory }}/key/vault/cdp_cert_{{ vault_env }}.zip"
+    - "/tmp/hashicorp/vault/secret_id.zip"
+    - "/tmp/hashicorp/vault/secret_id.info.json"
+    - "/tmp/hashicorp/vault/secret_id.meta.json"
+  tags:
+    - vault
+    - packaging
+    - bps
+    - connectivity
+
+

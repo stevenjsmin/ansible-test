@@ -1,0 +1,9 @@
+---
+
+- name: Remove Docker image
+  docker_image:
+    state: absent
+    name: "{{DOCKER_IMG_URL}}"
+    tag: "{{BUILD_VER}}"
+
+

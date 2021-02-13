@@ -1,0 +1,172 @@
+---
+
+# Stop tomcat
+- name: stop apache tomcat
+  shell: ". {{ ansible_env.HOME }}/.bashrc && {{ tomcat_directory }}/bin/shutdown.sh -force"
+  ignore_errors: true
+  tags:
+    - we
+
+# Create Backup folder of existing installation
+#- name: "create a backup zip file for Backup folder"
+#  archive:
+#    path: 
+#      - "{{ we_solution_directory }}/viewer"
+#      - "{{ we_solution_directory }}/WEB-INF"
+#      - "{{ we_base_software_directory }}/wra"
+#    dest: "{{experian_directory}}/Backup/backup_we{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}.zip"
+#    format: zip
+#  tags:
+#    - we
+
+# Remove existing installation
+- name: clean up existing installation
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ we_uninstall_list }}"
+  tags:
+    - we
+
+# Create deploy directory if it does not exist
+- name: create deploy directory
+  file:
+     path: "{{ item }}"
+     state: directory
+     recurse: yes
+  with_items:
+     - "{{ we_base_software_directory }}/deploy"
+  tags:
+     - we
+
+# Set fact for wra file to deploy
+- name: set fact for wra file to deploy
+  set_fact:
+    wra_file: "{{ pco_wra_file }}"
+  when: module == "pco"
+  tags: 
+    - we
+    - wra_file
+
+# Import find and copy role to copy wra file
+- name: find and copy wra file
+  import_role:
+    name: findandcopy
+  vars:
+    file_path: "{{ package_directory_bps }}/runtime"
+    regex_pattern: "{{ wra_file }}"
+    destination_directory: "{{ we_base_software_directory }}/deploy"
+  tags:
+    - we
+    - wra_file
+
+# Import find and copy role to copy bureau stylesheets xslt files
+- name: find and copy xslt files
+  import_role:
+    name: findandcopy
+  vars:
+    file_path: "{{ package_directory }}/{{ webengine_target }}/bureau_xslt"
+    regex_pattern: "(.*?).xslt"
+    destination_directory: "{{ we_solution_directory }}/WEB-INF/classes/com/experian/eda/dataviewer/webapp/helper"
+  when: module == "pce"
+  tags:
+    - we
+
+# Import find and copy role to copy bureau stylesheets css files
+- name: find and copy bureau stylesheets css files
+  import_role:
+    name: findandcopy
+  vars:
+    file_path: "{{ package_directory }}/{{ webengine_target }}/bureau_xslt/css"
+    regex_pattern: "(.*?).css"
+    destination_directory: "{{ we_solution_directory }}/viewer/css"
+  when: module == "pce"
+  tags:
+    - we
+
+# Copy bureau stylesheets img directory
+- name: Copy bureau stylesheets img directory
+  copy:
+    src: "{{ package_directory }}/{{ webengine_target }}/bureau_xslt/img"
+    dest: "{{ we_solution_directory }}/viewer"
+    remote_src: yes
+  when: module == "pce"
+  tags:
+    - we
+
+# Create xml directory if it does not exist
+- name: create xml directory
+  file:
+     path: "{{ we_solution_directory }}/viewer/xml"
+     state: directory
+     recurse: yes
+  when: module == "pce"
+  tags:
+     - we
+
+# Import find and copy role to copy bureau stylesheets xml files
+- name: find and copy bureau stylesheets xml files
+  import_role:
+    name: findandcopy
+  vars:
+    file_path: "{{ package_directory }}/{{ webengine_target }}/bureau_xslt/xml"
+    regex_pattern: "(.*?).xml"
+    destination_directory: "{{ we_solution_directory }}/viewer/xml"
+  when: module == "pce"
+  tags:
+    - we
+
+# Import find and copy role to copy anzcustom.js file
+- name: find and copy anzcustom.js file
+  import_role:
+    name: findandcopy
+  vars:
+    file_path: "{{ package_directory }}/{{ webengine_target }}"
+    regex_pattern: "anzcustom.js"
+    destination_directory: "{{ we_solution_directory }}/viewer/js"
+  when: module == "pce"
+  tags:
+    - we
+
+# Delete carriage return (CR) with sed command
+- name: Delete carriage return (CR) with sed command
+  shell: "sed -i 's/\\r$//' {{ dataviewer_file }}"
+  args:
+    warn: false
+  when: module == "pce"
+  tags:
+    - we
+
+# Include anzcustom.js in DataViewer.html file
+- name: Include anzcustom.js in DataViewer.html file
+  lineinfile:
+    path: "{{ dataviewer_file }}"
+    regexp: (.*?)anzcustom.js(.*?)
+    insertbefore: '    </wicket:head>'
+    line: "{{ anzcustom_script_tag }}"
+    state: present
+  when: module == "pce"
+  tags:
+    - we
+
+# Start tomcat
+- name: start apache tomcat
+  shell: ". {{ ansible_env.HOME }}/.bashrc && {{ tomcat_directory }}/bin/startup.sh"
+  tags:
+    - we
+
+# Import deploy role to deploy wra file
+- name: deploy wra file
+  import_role:
+    name: deploy
+  vars:
+    deploy_directory: "{{ we_base_software_directory }}/deploy"
+    regex_pattern: "(.*?).wra$"
+    regex_fail_pattern: "(.*?).wra.fail(.*?)"
+    fileType: "wra"
+    component: "we"
+  when: "'no_we_deploy' not in ansible_run_tags"
+  tags:
+    - we
+    - wra_file
+

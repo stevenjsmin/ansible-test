@@ -1,0 +1,30 @@
+---
+
+- name: Register cert file
+  stat:
+    path: "/opt/Experian/PowerCurve/key/vault/ausmcdpsupportqdsa.pem"
+  register: datapower_cert_file
+
+- name: Register key file
+  stat:
+    path: "/opt/Experian/PowerCurve/key/vault/ausmcdpsupportqdsa.key"
+  register: datapower_key_file
+
+
+- name: Prepare key and cert to go HashiCorp via Datapower
+  block:
+    # Download Cert and Key for HashiCorp Vault
+    - get_url:
+        url: "{{ artifactory_url }}/artifactory/{{ artifactory_repository }}/dependencies/hashicorp/cert/cdp_cert_{{ vault_env }}.zip"
+        dest: "{{ powercurve_directory }}/key/vault/"
+        validate_certs : false
+        timeout: 120
+
+    # Unarchive cdp_cert_{{ vault_env }}.zip file
+    - unarchive:
+        src: "{{ powercurve_directory }}/key/vault/cdp_cert_{{ vault_env }}.zip"
+        dest: "{{ powercurve_directory }}/key/vault"
+        extra_opts:
+          - "-P"
+          -  "{{ artifactory_password }}"
+  when: datapower_cert_file.stat.exists == False or datapower_key_file.stat.exists == False

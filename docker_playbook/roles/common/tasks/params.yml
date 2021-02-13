@@ -1,0 +1,40 @@
+---
+
+# In here we can put common variables that should be pre-define before do further process for all roles
+#   - Set as default value if no difile
+#   - Assert for essential variables
+#   - Process for refiltering from existing variable
+
+- name: Set environment BUILD_VER
+  set_fact:
+    BUILD_VER: "0.0.0"
+  when: BUILD_VER is undefined
+
+
+- name: Set environment BUILD_USER_EMAIL
+  set_fact:
+    BUILD_USER_EMAIL: "noreply-cdp@anz.com"
+  when: BUILD_USER_EMAIL is undefined
+
+
+- assert:
+    that:
+      - item is defined
+      - item is not none
+      - ( item | trim != '' )
+    msg: "FAILED: Missing environment variables"
+  with_items:
+    - "{{ MODULE }}"
+
+
+- name: set facts
+  set_fact:
+    BUILD_USER="{{ BUILD_USER_EMAIL.split('@')[-2]|list|join() }}"
+
+
+
+
+- debug: var=BUILD_USER_EMAIL
+- debug: var=BUILD_USER
+- debug: var=WORKING_DIR
+- debug: var=BUILD_VER

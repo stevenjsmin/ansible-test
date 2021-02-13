@@ -1,0 +1,25 @@
+---
+
+- name: Create {{OP_RSC_TYPE}} template
+  template:
+    src:  "{{ inventory_dir }}/openshift_templates/{{ OP_RSC_TYPE }}.j2"
+    dest: "{{ WORKING_DIR }}/{{ OP_RSC_TYPE }}.yml"
+
+- stat: path="{{ WORKING_DIR }}/{{ OP_RSC_TYPE }}.yml"
+  register: templateCreateResult
+
+
+- name: Check {{ OP_RSC_TYPE }}.yml file creation result
+  assert:
+    that:
+      - templateCreateResult.stat.exists == true
+    msg: "Cannot find {{ WORKING_DIR }}/{{ OP_RSC_TYPE }}.yml"
+
+
+- name: Run OC Apply command for Creation
+  shell: 'oc process -f {{ WORKING_DIR }}/{{ OP_RSC_TYPE }}.yml | oc apply -f -'
+  register: openShiftCmdResult
+  ignore_errors: no
+
+
+- debug: var=openShiftCmdResult

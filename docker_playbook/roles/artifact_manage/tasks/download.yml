@@ -1,0 +1,19 @@
+---
+
+- debug: msg="Artifact management on Jfrog - {{ ACTION }}"
+
+- name: Download to Artifactory
+  get_url:
+    url: "https://{{artifact_svr_host}}:{{artifact_svr_port}}/artifactory/CDP/pipeline/{{FROM_ARTIFACT_NAME}}"
+    dest: "{{TO_ARTIFACT_NAME}}"
+    validate_certs: no
+    url_username: "{{ SVC_ACCOUNT_USER_ID }}"
+    url_password: "{{ SVC_ACCOUNT_USER_PWD }}"
+    force_basic_auth: yes
+    timeout: 420
+  register: jfrog_repo_download
+  retries: 5
+  delay: 20
+  ignore_errors: yes
+
+- debug: var=jfrog_repo_download

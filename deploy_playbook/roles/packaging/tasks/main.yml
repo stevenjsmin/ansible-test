@@ -1,0 +1,143 @@
+---
+# file: packaging/tasks/main.yml
+#
+# tasks file
+#
+
+# Set bps_target variable
+- name: Set bps_target variable
+  set_fact:
+    bps_target: "{{ hostvars[inventory_hostname]['bps_target'] | default(node_name) }}"
+  tags:
+    - packaging
+    - bps
+
+# Execute packaging script
+- name: Run a script using an executable in a system path
+  script: "{{ config_script_bps }} --target {{ bps_target }} --config {{ config_bps }} --module {{ module }}"
+  args:
+    executable: "{{ python_path }}"
+    chdir: "{{ git_repo_directory }}"
+  tags:
+    - packaging
+    - bps
+
+# Install required python modules
+- name: install Python modules
+  include_role:
+    name: install_python_module
+  vars:
+    python_module: "{{ item }}"
+  with_items: "{{ python_modules }}"
+  tags:
+    - packaging
+    - connectivity
+
+# Set connectivity endpoint variable
+- name: Set connectivity_endpoint variable
+  set_fact:
+    connectivity_endpoint: "{{ hostvars[inventory_hostname]['connectivity_endpoint'] | default(connectivity_endpoint) }}"
+  tags:
+    - packaging
+    - connectivity
+
+# Set connectivity debug variable
+- name: Set connectivity_debug variable
+  set_fact:
+    connectivity_debug: "{{ hostvars[inventory_hostname]['connectivity_debug'] | default(connectivity_debug) }}"
+  tags:
+    - packaging
+    - connectivity
+
+# Set connectivity outbound channel variable
+- name: Set connectivity_outbound_channel variable
+  set_fact:
+    connectivity_outbound_channel: "{{ hostvars[inventory_hostname]['connectivity_outbound_channel'] | default(connectivity_outbound_channel) }}"
+  tags:
+    - packaging
+    - connectivity
+
+# Set connectivity inbound channel variable
+- name: Set connectivity_inbound_channel variable
+  set_fact:
+    connectivity_inbound_channel: "{{ hostvars[inventory_hostname]['connectivity_inbound_channel'] | default(connectivity_inbound_channel) }}"
+  tags:
+    - packaging
+    - connectivity
+
+# Set connectivity pcebound channel variable
+- name: Set connectivity_pcebound_channel variable
+  set_fact:
+    connectivity_pcebound_channel: "{{ hostvars[inventory_hostname]['connectivity_pcebound_channel'] | default(connectivity_pcebound_channel) }}"
+  when: module == "pco"
+  tags:
+    - packaging
+    - connectivity
+
+# Set connectivity disablemq variable
+- name: Set connectivity_disablemq variable
+  set_fact:
+    connectivity_disablemq: "{{ hostvars[inventory_hostname]['connectivity_disablemq'] | default(connectivity_disablemq) }}"
+  when: module == "pco"
+  tags:
+    - packaging
+    - connectivity
+
+# Set connectivity_target variable
+- name: Set connectivity_target variable
+  set_fact:
+    connectivity_target: "{{ hostvars[inventory_hostname]['connectivity_target'] | default(node_name) }}"
+  tags:
+    - packaging
+    - connectivity
+
+# Set solution_version variable
+- name: Set solution_version variable
+  set_fact:
+    solution_version: "{{ hostvars[inventory_hostname]['solution_version'] | default(solution_version) }}"
+  tags:
+    - packaging
+    - connectivity
+
+# Execute pce packaging script
+- name: "execute pce packaging script"
+  script: "{{ package_script_conn }}  --release {{ solution_version }} --target {{ connectivity_target }} --debug {{ connectivity_debug }} --out-channel {{ connectivity_outbound_channel }} --in-channel {{ connectivity_inbound_channel }} --config {{ config_conn }} --endpoint {{ connectivity_endpoint }}"
+  args:
+    executable: "{{ python_path }}"
+    chdir: "{{ git_repo_directory }}"
+  when: module == "pce"
+  tags:
+    - packaging
+    - connectivity
+
+# Execute pco packaging script
+- name: "execute pco packaging script"
+  script: "{{ package_script_conn }}  --release {{ solution_version }} --target {{ connectivity_target }} --debug {{ connectivity_debug }} --disable-mq {{ connectivity_disablemq }} --out-channel {{ connectivity_outbound_channel }} --in-channel {{ connectivity_inbound_channel }} --pce-channel {{ connectivity_pcebound_channel }} --config {{ config_conn }} --endpoint {{ connectivity_endpoint }}"
+  args:
+    executable: "{{ python_path }}"
+    chdir: "{{ git_repo_directory }}"
+  when: module == "pco"
+  tags:
+    - packaging
+    - connectivity
+
+# Set webengine_target variable
+- name: Set bps_target variable
+  set_fact:
+    webengine_target: "{{ hostvars[inventory_hostname]['webengine_target'] | default(node_name) }}"
+  when: module == "pce"
+  tags:
+    - packaging
+    - we
+
+# Execute pce packaging script
+- name: "execute pce packaging script"
+  script: "{{ package_script_we }} --target {{ webengine_target }} --tomcat_directory {{ tomcat_directory }} --config {{ config_we }}"
+  args:
+    executable: "{{ python_path }}"
+    chdir: "{{ git_repo_directory }}"
+  when: module == "pce" and ('web_nodes' in group_names)
+  tags:
+    - packaging
+    - we
+

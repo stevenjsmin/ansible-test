@@ -1,0 +1,87 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: "cdp-{{ MODULE | lower }}-deploymentConfig-template"
+objects:
+  - kind: DeploymentConfig
+    apiVersion: v1
+    metadata:
+      name: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+      annotations:
+        description: "{{ MODULE | lower }} on {{ cdp.module_type }} mode"
+      labels:
+        app: "{{ MODULE | lower }}-pco"
+        cdp-ver: "{{ cdp.software_ver }}"
+        cdp-app_ver: "{{ cdp.software_ver }}"
+        app-type: "{{ cdp.module_type }}"
+        {{ MODULE | lower }}-docker: "{{ DOCKER_VER }}"
+    spec:
+      replicas: 1
+      selector:
+        app: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+        deploymentconfig: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+      strategy:
+        activeDeadlineSeconds: 21600
+        resources:
+          limits:
+            cpu: {{openshift.resource.limits.cpu}}
+            memory: {{openshift.resource.limits.memory}}
+          requests:
+            cpu: {{openshift.resource.requests.cpu}}
+            memory: {{openshift.resource.requests.memory}}
+        type: Rolling
+      template:
+        metadata:
+          annotations:
+            openshift.io/generated-by: OpenShiftNewApp
+          creationTimestamp: null
+          labels:
+            app: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+            deploymentconfig: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+        spec:
+          containers:
+            - image: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+              name: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+              resources:
+                limits:
+                  cpu: {{openshift.resource.limits.cpu}}
+                  memory: {{openshift.resource.limits.memory}}
+                requests:
+                  cpu: {{openshift.resource.requests.cpu}}
+                  memory: {{openshift.resource.requests.memory}}
+              ports:
+{% for item in openshift.expose_ports %}
+                - containerPort: {{ item }}
+                  protocol: TCP
+{% endfor %}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/config
+                  name: {{ MODULE | lower }}-mount
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: {{ MODULE | lower }}-config
+              name: {{ MODULE | lower }}-mount
+      test: false
+      triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - "{{ MODULE | lower }}-{{ cdp.module_type }}"
+            from:
+              kind: ImageStreamTag
+              name: "{{ MODULE | lower }}-{{ cdp.module_type }}:latest"
+          type: ImageChange
+
+
+
+
+

@@ -1,0 +1,23 @@
+version: 1.9
+tomcat_version: 8.5.53
+module: "pce"
+webengine_target: "dev1_pce"
+
+tomcat_directory: "{{ powercurve_directory }}/apache-tomcat-{{ tomcat_version }}"
+we_solution_directory: "{{ tomcat_directory }}/webapps/WebEngine"
+we_base_software_directory: "{{powercurve_directory}}/Web\ Engine"
+package_directory: "{{ git_repo_directory }}/cdp/{{ module }}/web/package"
+package_directory_bps: "{{ git_repo_directory }}/cdp/{{ module }}/bps"
+
+we_uninstall_list:
+       - "{{we_base_software_directory}}/deploy"
+       - "{{we_base_software_directory}}/logs"
+
+pco_wra_file: "Originations_BPC.wra" 
+pce_wra_file: "ConnectPlus Orchestration.wra"
+
+wra_file: "{{ pce_wra_file }}"
+
+dataviewer_file: "{{ we_solution_directory }}/WEB-INF/classes/com/experian/eda/dataviewer/webapp/pages/DataViewer.html"
+anzcustom_script_tag: "        <script type=\"text/javascript\" src=\"viewer/js/anzcustom.js\"></script>"
+

@@ -1,0 +1,12 @@
+---
+
+- include: "{{ playbook_dir }}/roles/build_docker/prereqs/params.yml"
+
+- include: "{{ playbook_dir }}/roles/build_docker/tasks/dockerLogin.yml"
+  when: ACTION == "build"
+
+- include: "{{ playbook_dir }}/roles/build_docker/tasks/buildDockerImage.yml"
+  when: ACTION == "build"
+
+- include: "{{ playbook_dir }}/roles/build_docker/tasks/deleteDockerImage.yml"
+  when: ACTION == "delete"

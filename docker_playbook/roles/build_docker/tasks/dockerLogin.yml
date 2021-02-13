@@ -1,0 +1,9 @@
+---
+
+- name: Log into private registry {{artifact_svr_host}}:{{artifact_svr_port}}
+  docker_login:
+    registry: "{{artifact_svr_host}}:{{artifact_svr_port}}"
+    username: "{{SVC_ACCOUNT_USER_ID}}"
+    password: "{{SVC_ACCOUNT_USER_PWD}}"
+    email: "{{SVC_ACCOUNT_USER_EMAIL}}"
+    reauthorize: no

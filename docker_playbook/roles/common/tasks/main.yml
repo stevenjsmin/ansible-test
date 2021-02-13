@@ -1,0 +1,9 @@
+---
+
+- name: Import common parameters
+  include: "{{ playbook_dir }}/roles/common/tasks/params.yml"
+
+# We can include additional COMMON module here
+
+# We can send notification before start this job
+# - include: "{{ playbook_dir }}/roles/notifications/tasks/main.yml"

@@ -1,0 +1,27 @@
+---
+
+- debug: msg="Artifact management on Jfrog - {{ ACTION }}"
+
+#- name: Upload to Artifactory
+#  shell: 'curl  --connect-timeout 30 --user "{{SVC_ACCOUNT_USER_ID}}:{{SVC_ACCOUNT_USER_PWD}}"  --create-dirs --retry 10 -s -S -n -k -w "%{http_code}" -T "{{FROM_ARTIFACT_NAME}}"  "https://{{artifact_svr_host}}:{{artifact_svr_port}}/artifactory/CDP/pipeline/{{TO_ARTIFACT_NAME}}"'
+#  args:
+#    warn: no
+#  register: jfrog_repo_upload
+
+
+- name: Upload to Artifactory
+  uri:
+    url: "https://{{artifact_svr_host}}:{{artifact_svr_port}}/artifactory/CDP/pipeline/{{TO_ARTIFACT_NAME}};status=unstable"
+    user: "{{SVC_ACCOUNT_USER_ID}}"
+    password: "{{SVC_ACCOUNT_USER_PWD}}"
+    validate_certs: no
+    force_basic_auth: yes
+    method: PUT
+    return_content: yes
+    src: "{{FROM_ARTIFACT_NAME}}"
+    status_code: 201
+    remote_src: yes
+  register: jfrog_repo_upload
+
+
+- debug: var=jfrog_repo_upload

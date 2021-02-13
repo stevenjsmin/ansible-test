@@ -1,0 +1,16 @@
+---
+
+github_user: "AUCDPUSERDSA"
+
+solution_branch: "dev"
+solution_version: "20.6.2"
+
+git_repo_url_cdp: "https://{{ github_user | urlencode }}:{{ github_password | urlencode }}@bitbucket.service.anz/scm/cdp/cdp.git"
+branch_cdp: "{{ solution_branch }}/{{ solution_version }}"
+
+git_repo_url_ci_scripts: "https://{{ github_user | urlencode }}:{{ github_password | urlencode }}@bitbucket.service.anz/scm/cdp/ci_scripts.git"
+branch_ci_scripts: "feature/poc-for-linux"
+
+ci_scripts_repo: "{{ git_repo_directory }}/ci_scripts"
+cdp_repo: "{{ git_repo_directory }}/cdp"
+

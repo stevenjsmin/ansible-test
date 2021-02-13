@@ -1,0 +1,31 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: "cdp-{{ MODULE | lower }}-service-template"
+objects:
+  - kind: Route
+    apiVersion: v1
+    metadata:
+      name: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+      annotations:
+        description: "{{ MODULE | lower }} on {{ cdp.module_type }} mode"
+      labels:
+        app: "{{ MODULE | lower }}-pco"
+        cdp-ver: "{{ cdp.software_ver }}"
+        cdp-app_ver: "{{ cdp.software_ver }}"
+        app-type: "{{ cdp.module_type }}"
+        {{ MODULE | lower }}-docker: "{{ DOCKER_VER }}"
+    spec:
+      host: "{{ MODULE | lower }}-{{ cdp.module_type }}-{{ openshift_cdp_nameSpace }}.{{ openshift_cdp_baseUrl }}"
+      port:
+        targetPort: {{openshift.target_port}}-tcp
+      to:
+        kind: Service
+        name: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+        weight: 100
+        wildcardPolicy: None
+
+
+
+
+

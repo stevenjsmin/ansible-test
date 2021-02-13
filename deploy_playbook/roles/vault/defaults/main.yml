@@ -1,0 +1,65 @@
+---
+
+python_modules:
+  - requests
+
+# Default/Non production HashiCorp Vault variables
+vault_env: "nonprod"
+vault_host: "https://securitygwqa.corp.dev.anz:8448"
+vault_dp_sa: "ausmcdpsupportqdsa.service.dev"
+vault_role_id: "b4b7b8e3-cc80-70af-bc45-8ab8f992ac24"
+
+# Production HashiCorp Vault variables
+vault_prod_env: "prod"
+vault_prod_host: "https://securitygw.corp.apps.anz:8448"
+vault_prod_dp_sa: "ausmcdpsupportqdsa.service.anz"
+vault_prod_role_id: "7859b797-dbea-1a87-148a-fa59fa484c95"
+
+vault_dp_cert: "{{ powercurve_directory }}/key/vault/ausmcdpsupportqdsa.pem"
+vault_dp_key: "{{ powercurve_directory }}/key/vault/ausmcdpsupportqdsa.key"
+vault_check_out_script: "{{ git_repo_directory }}/ci_scripts/hashicorp_vault/vault_check_out.py"
+vault_gen_secretid_script: "{{ git_repo_directory }}/ci_scripts/hashicorp_vault/vault_create_secretid.py"
+vault_out_dir: "/opt/Experian/passwords"
+
+vault_ns: "bs_cdp_powercurve"
+vault_platform: "int"
+vault_secretid_renewal_days: "20"
+artifactory_user: "aucdpuserdsa"
+
+# BPS - Non-production
+vault_nonprod_bps_secret_files:
+  - "password_files/bps/global_system_passwords.json"
+
+# BPS - Production
+vault_prod_bps_secret_files:
+  - "password_files/bps/global_system_passwords.json"
+
+# Connectivity PCE - Non-production
+vault_nonprod_connectivity_pce_secret_files:
+  - "password_files/connectivity/pce/nonprod.environment.system.passwords.properties"
+  - "password_files/connectivity/pce/nonprod.global.system.passwords.properties"
+
+# Connectivity PCE - Production
+vault_prod_connectivity_pce_secret_files:
+  - "password_files/connectivity/pce/CommercialXmlCsv.properties"
+  - "password_files/connectivity/pce/ConsumerXmlCsv.properties"
+  - "password_files/connectivity/pce/prod.environment.system.passwords.properties"
+  - "password_files/connectivity/pce/xmlcsv.properties"
+
+# Connectivity PCO - Non-production
+vault_nonprod_connectivity_pco_secret_files:
+  - "password_files/connectivity/pco/nonprod.environment.system.passwords.properties"
+  - "password_files/connectivity/pco/nonprod.environment.system.passwords.properties.encrypted"
+  - "password_files/connectivity/pco/nonprod.global.system.passwords.properties"
+  - "password_files/connectivity/pco/nonprod.global.system.passwords.properties.encrypted"
+  - "password_files/connectivity/pco/nonprod-AEScryptoKey.key"
+
+# Connectivity PCO - Production
+vault_prod_connectivity_pco_secret_files:
+  - "password_files/connectivity/pco/prod.environment.system.passwords.properties"
+  - "password_files/connectivity/pco/prod.environment.system.passwords.properties.encrypted"
+  - "password_files/connectivity/pco/prod.ftl.passwords.properties"
+  - "password_files/connectivity/pco/prod.global.system.passwords.properties"
+  - "password_files/connectivity/pco/prod.global.system.passwords.properties.encrypted"
+  - "password_files/connectivity/pco/prod-AEScryptoKey.key"
+

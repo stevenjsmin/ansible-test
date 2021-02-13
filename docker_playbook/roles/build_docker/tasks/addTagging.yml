@@ -1,0 +1,40 @@
+---
+
+- debug: var=GIT_BASE_URL
+- debug: var=GIT_CHECKOUT_BRANCH
+
+# Create Tag on Commit ID of GIT and push it
+- name: Build Docker image for BPS module
+  block:
+    - debug: msg="Fetch latest commit hash from git ref"
+    - git:
+        repo: "{{GIT_BASE_URL}}/ci_docker.git"
+        version: "{{GIT_CHECKOUT_BRANCH}}"
+        clone: no
+        accept_hostkey: true
+      register: git_sha1_results
+
+    - debug: var=git_sha1_results
+
+    - debug: msg="Create versioning tagging on git"
+    - command: "git tag {{MODULE}}-{{BUILD_VER}} {{ git_sha1_results.after }}"
+      args:
+        warn: false
+        chdir: "{{WORKING_DIR}}/ci_docker"
+      register: tagged
+
+    - debug: msg="Create latest tagging on git"
+    - command: "git tag {{MODULE}}-{{BUILD_VER}}-latest {{ git_sha1_results.after }}"
+      args:
+        warn: false
+        chdir: "{{WORKING_DIR}}/ci_docker"
+      register: taggedLatest
+      when: CREATE_LATEST_TAG == "yes"
+
+    - debug: msg="PUSH all created tags on git"
+    - name: Push tags
+      command: "git push --tags"
+      args:
+        warn: false
+        chdir: "{{WORKING_DIR}}/ci_docker"
+  when: DOCKER_IMG_PUSH == "yes"

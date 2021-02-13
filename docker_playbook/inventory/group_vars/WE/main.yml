@@ -1,0 +1,24 @@
+---
+
+## Define MODULE SPECIFIC variables
+
+cdp:
+  software_ver: "1.7"
+  module_type:   "pco"
+
+openshift:
+  target_port: "8090"
+  expose_ports:
+    - 8090
+    - 8092
+    - 8098
+    - 8081
+    - 8083
+    - 8099
+  resource:
+    limits:
+      cpu: "1500m"
+      memory: "4Gi"
+    requests:
+      cpu: "100m"
+      memory: "1Gi"

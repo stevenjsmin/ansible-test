@@ -1,0 +1,33 @@
+---
+
+- set_fact:
+    WORKING_DIR: "{{ inventory_dir | dirname }}"
+
+- set_fact:
+    USER_NAME: "{{ EMAIL |regex_findall('.+(?=@)') }}"
+
+# Create email template : Filling values on variable on J2 file
+- template:
+    src: "{{ playbook_dir }}/roles/notifications/files/email_nodify_result.j2"
+    dest: "{{ WORKING_DIR }}/email_nodify_result.eml"
+
+- mail:
+    host: smtp.service.anz.com
+    port: 25
+    subtype: "html"
+    subject: "LOAD TEST RESULT FOR {{ APP_MODULE }} [REQUEST ID : {{ REQUEST_ID }}]"
+    body: '{{ lookup("file", "{{ WORKING_DIR }}/email_nodify_result.eml") }}'
+    from: noreply@anz.com
+    to: "{{ EMAIL }}"
+    cc: "{{ CC_EMAIL }}"
+    charset: utf8
+  delegate_to: localhost
+  register: mailstatus
+  until: mailstatus|success
+  retries: 20
+  delay: 10
+  async: 300
+  poll: 0
+  ignore_errors: yes
+
+- debug: var=mailstatus

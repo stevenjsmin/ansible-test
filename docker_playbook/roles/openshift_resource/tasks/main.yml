@@ -1,0 +1,26 @@
+---
+
+- debug: var=inventory_dir
+- debug: var=MODULE
+
+## CMD_TYPE [create | remove]
+- name: Set environment CMD_TYPE
+  set_fact:
+      CMD_TYPE: "create"
+  when: CMD_TYPE is undefined
+
+
+## OP_RSC_TYPE [imageStream | deploymentConfig | service | route]
+- name: Set environment Openshift Resource Type
+  set_fact:
+    OP_RSC_TYPE: "imageStream"
+  when: OP_RSC_TYPE is undefined
+
+
+- name: Create Openshift Credential and Set default workspace
+  include: "{{ playbook_dir }}/roles/openshift_resource/tasks/createCredential.yml"
+
+
+- name: Run Openshift command to {{OP_RSC_TYPE}}
+  include: "{{ playbook_dir }}/roles/openshift_resource/tasks/{{ CMD_TYPE }}.yml"
+

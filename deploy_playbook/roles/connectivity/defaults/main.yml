@@ -1,0 +1,42 @@
+version: 1.8
+
+module: "pce"
+
+connectivity_target: "dev1_pce"
+
+create_config_script_path: "{{ git_repo_directory }}/ci_scripts/make_package_{{ module }}_ccm/{{ module }}_ccm_package_1.7.py"
+config: "{{ git_repo_directory }}/ci_scripts/make_package_{{ module }}_ccm/config.ini"
+
+connectivity_solution: "{{ experian_directory }}/Connectivity_Solution"
+connectivity_base_software_directory: "{{ powercurve_directory }}/connectivity-v{{ version }}"
+
+connectivity_uninstall_list:
+  - "{{ connectivity_solution }}"
+  - "{{ connectivity_base_software_directory }}/bin/nohup"
+
+package_directory: "{{ git_repo_directory }}/cdp/{{ module }}/conn/package"
+
+error_log_file: "{{ connectivity_solution }}/logs/Error.log"
+
+connectivity_keystore_file: "{{ powercurve_directory }}/key/*.jks"
+
+# Needs to be added to packaging
+tdpd_ser_file: "TDPD.ser"
+
+# Only required for PCE
+#connect_plus_unique_id_file: "{{ connectivity_solution }}/conf/system/connectPlusUniqueId.properties"
+#default_db_name: "PCE_BPS"
+#default_db_port: "49169"
+#runtime_db_host_input: "SQLAU401MEL0020.globaltest.anz.com"
+#connect_plus_unique_id_sequence: 1
+#connect_plus_unique_id_prefix: "14"
+
+#connect_plus_query: |
+#    "SET NoCount ON; SELECT [CONNECTPLUSUNIQUEID]
+#    FROM [EDA_TENANT1].[PCE_LOG]
+#    WHERE CONNECTPLUSUNIQUEID LIKE '{{ connect_plus_unique_id_prefix }}%'
+#    AND CONNECTPLUSUNIQUEID = ( SELECT MAX(CONNECTPLUSUNIQUEID)
+#    FROM [EDA_TENANT1].[PCE_LOG]); SET NoCount OFF;"
+
+#sqlcmd: "/opt/mssql-tools/bin/sqlcmd"
+

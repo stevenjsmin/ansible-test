@@ -1,0 +1,8 @@
+---
+# tasks file for we
+
+- name: Deploy Web Engine
+  include: deploy.yml
+  when: ('web_nodes' in group_names)
+  tags: we
+

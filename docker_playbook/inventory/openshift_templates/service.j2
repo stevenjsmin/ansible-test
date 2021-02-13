@@ -1,0 +1,35 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: "cdp-{{ MODULE | lower }}-service-template"
+objects:
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+      annotations:
+        description: "{{ MODULE | lower }} on {{ cdp.module_type }} mode"
+      labels:
+        app: "{{ MODULE | lower }}-pco"
+        cdp-ver: "{{ cdp.software_ver }}"
+        cdp-app_ver: "{{ cdp.software_ver }}"
+        app-type: "{{ cdp.module_type }}"
+        {{ MODULE | lower }}-docker: "{{ DOCKER_VER }}"
+    spec:
+      ports:
+{% for item in openshift.expose_ports %}
+        - name: {{ item }}-tcp
+          port: {{ item }}
+          protocol: TCP
+          targetPort: {{ item }}
+{% endfor %}
+      selector:
+        app: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+        deploymentconfig: "{{ MODULE | lower }}-{{ cdp.module_type }}"
+      sessionAffinity: None
+      type: ClusterIP
+
+
+
+
+

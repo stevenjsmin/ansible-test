@@ -1,0 +1,10 @@
+---
+
+- name: Docker build Job
+  hosts: "localhost"
+  roles:
+    - { role: common }
+    - { role: build_docker }
+
+  vars_files:
+    - "{{ inventory_dir }}/group_vars/{{ MODULE }}/main.yml"

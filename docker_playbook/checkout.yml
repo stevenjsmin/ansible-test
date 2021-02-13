@@ -1,0 +1,6 @@
+---
+
+- name: Checkout code
+  hosts: "localhost"
+  roles:
+    - { role: checkout }

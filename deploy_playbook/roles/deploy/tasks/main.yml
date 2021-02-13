@@ -1,0 +1,63 @@
+---
+
+# Deploy dbpdm, jar, bpc or wra files
+- name: "wait for {{fileType}} file in {{deploy_directory}} folder to be deployed"
+  find:
+    paths: "{{deploy_directory}}"
+    use_regex: yes
+    patterns: "{{regex_pattern}}"
+  register: file_list
+  until: file_list.matched == 0
+  when: fileType == 'dbpdm' or fileType == 'jar' or fileType == 'bpc' or fileType == 'wra'
+  retries: 30
+  delay: 30
+
+- debug: var=file_list
+
+# Check if dbpdm, jar, bpc or wra file failed
+- name: "find {{fileType}} file in Deploy folder"
+  find:
+    paths: "{{deploy_directory}}"
+    use_regex: yes
+    patterns: "{{regex_fail_pattern}}"
+  register: file_list
+  when: fileType == 'dbpdm' or fileType == 'jar' or fileType == 'bpc' or fileType == 'wra'
+
+- debug: var=file_list
+  when: fileType == 'dbpdm' or fileType == 'jar' or fileType == 'bpc' or fileType == 'wra'
+
+# Check if dbpdm, jar, bpc or wra deployment failed or was successful
+- name: "check if {{fileType}} deployment failed"
+  fail: msg="{{fileType}} deployment failed"
+  when: (fileType == 'dbpdm' or fileType == 'jar' or fileType == 'bpc' or fileType == 'wra') and file_list.matched > 0
+
+# Search for completed status in log
+#- name: Search for bpc completed status in log
+# # become: yes
+# # become_user: root
+#  lineinfile:
+#    path: "{{log_path}}"
+#    line: "{{search_string}}"
+#    state: present
+#  check_mode: yes
+#  register: string_presence
+#  when: fileType == 'bpc'
+#  tags:
+#    - bps
+#    - bpc
+
+# Search for completed status in log
+- name: "Search for bpc completed status in log"
+  shell: "grep -i '{{search_string}}' {{log_path}}"
+  register: string_presence
+  #ignore_errors: true
+  failed_when: string_presence.rc != 1 and string_presence.rc != 0
+  when: fileType == 'bpc'
+  until: string_presence.rc == 0
+  retries: 30
+  delay: 30
+  tags:
+    - bpc
+
+- debug: var=string_presence
+  when: fileType == 'bpc'

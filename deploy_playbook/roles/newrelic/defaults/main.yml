@@ -1,0 +1,8 @@
+---
+# defaults file for agent-infra
+
+newrelic_home: "{{ experian_directory }}/NewRelic"
+newrelic_infra_home: "{{ newrelic_home }}/newrelic-infra"
+
+newrelic_infra_pidfile: "{{ newrelic_infra_home }}/newrelic-infra/var/run/newrelic-infra/newrelic-infra.pid"
+

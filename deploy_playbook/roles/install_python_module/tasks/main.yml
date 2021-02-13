@@ -1,0 +1,25 @@
+#Find if a specific python module is installed
+- name: Find if python module is installed
+  script: "/opt/Experian/PowerCurve/python-3.6.10/bin/pip list | grep {{python_module}} "
+  register: module_exists
+  failed_when: module_exists.rc != 0 and module_exists.rc != 1
+  tags:
+    - vault
+    - packaging
+    - bps
+    - connectivity
+
+#- debug: var=module_exists.rc
+
+#- debug: var=module_exists
+
+#Install python module if it does not exist
+- name: Install python module {{python_module}}
+  command: "/opt/Experian/PowerCurve/python-3.6.10/bin/pip install {{python_module}} "
+  when: module_exists.rc == 1
+  tags:
+    - vault
+    - packaging
+    - bps
+    - connectivity
+

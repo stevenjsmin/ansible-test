@@ -1,0 +1,34 @@
+---
+# tasks file for permissions
+
+- name: Set read permissions to directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: u=rwX,g=rX,o=rX
+  with_items: "{{ read_access_directories }}"
+  tags: 
+    - permissions
+    - always
+
+- name: Find all log files which we want to apply read only permissions
+  find:
+    paths: "{{ item }}"
+    file_type: file
+    patterns: "*.log"
+  register: readonly_filelist
+  with_items: "{{ read_access_directories }}"
+  tags:
+    - permissions
+    - always
+
+- name: Set read only permissions to all log files found
+  file:
+    path: "{{ item }}"
+    state: file
+    mode: "o+r"
+  with_items: "{{ readonly_filelist.results | sum(attribute='files', start=[]) | map(attribute='path') | list }}"
+  tags:
+    - permissions
+    - always
+

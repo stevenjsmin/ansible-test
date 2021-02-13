@@ -1,0 +1,26 @@
+---
+
+# Define role specific variables
+- name: Set environment GIT_BASE_URL
+  set_fact:
+    GIT_BASE_URL: "ssh://git@bitbucket.service.anz/cdp"
+  when: GIT_BASE_URL is undefined or GIT_BASE_URL is none
+
+
+- name: Set environment GIT_CHECKOUT_BRANCH
+  set_fact:
+    GIT_CHECKOUT_BRANCH: "develop"
+  when: GIT_CHECKOUT_BRANCH is undefined or GIT_CHECKOUT_BRANCH is none
+
+# Make sure the variables values
+- assert:
+    that:
+      - item is defined
+      - item is not none
+      - ( item | trim != '' )
+    msg: "FAILED: Missing environment variables"
+  with_items:
+    - "{{ GIT_BASE_URL }}"
+    - "{{ GIT_CHECKOUT_BRANCH }}"
+    - "{{ GIT_REPO_NAME }}"
+

@@ -1,0 +1,33 @@
+---
+
+# Required for connectivity packaging
+python_modules:
+  - javaproperties
+  - lxml
+  - packaging
+
+solution_version: 20.6.2
+
+# Packaging scripts and config files
+config_script_bps: "{{ git_repo_directory }}/ci_scripts/create_bps_config/create_bps_config.py"
+config_bps: "{{ git_repo_directory }}/ci_scripts/create_bps_config/config.ini"
+
+package_script_conn: "{{ git_repo_directory }}/ci_scripts/make_package_{{ module }}_ccm/{{ module }}_ccm_package_1.8.py"
+config_conn: "{{ git_repo_directory }}/ci_scripts/make_package_{{ module }}_ccm/config.ini"
+
+package_script_we: "{{ git_repo_directory }}/ci_scripts/make_package_{{ module }}_web/{{ module }}_web_package.py"
+config_we: "{{ git_repo_directory }}/ci_scripts/make_package_{{ module }}_web/config.ini"
+
+# Web engine script argument
+tomcat_directory: "{{ powercurve_directory }}/apache-tomcat-8.5.53"
+
+# Connectivity script arguments
+connectivity_debug: false
+connectivity_outbound_channel: "http"
+connectivity_inbound_channel: "http"
+connectivity_endpoint: "cbsimulator"
+
+## Only required for PCO
+connectivity_disablemq: "mq1 mq2 mq3 mq4 mq5 mq6"
+connectivity_pcebound_channel: "http"
+

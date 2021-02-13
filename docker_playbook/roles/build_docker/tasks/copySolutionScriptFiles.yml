@@ -1,0 +1,6 @@
+---
+
+- name: Copy solution and scripts file
+  block:
+    - command: "rsync -av --progress --exclude=.git {{WORKSPACE}}/cdp {{WORKING_DIR}}/ci_docker/Images/{{MODULE}}/runtimeImage/"
+    - command: "mv {{WORKING_DIR}}/ci_scripts {{WORKING_DIR}}/ci_docker/Images/{{MODULE}}/runtimeImage/"

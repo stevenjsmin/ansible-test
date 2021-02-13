@@ -1,0 +1,48 @@
+---
+
+- name: Set solution_branch variable
+  set_fact:
+    solution_branch: "{{ hostvars[inventory_hostname]['solution_branch'] | default(solution_branch) }}"
+  tags:
+    - clone_repo
+    - bps
+    - connectivity
+    - we
+
+- name: Set solution_version variable
+  set_fact:
+    solution_version: "{{ hostvars[inventory_hostname]['solution_version'] | default(solution_version) }}"
+  tags:
+    - clone_repo
+    - bps
+    - connectivity
+    - we
+
+# Clone ci_scripts repository
+- name: import git_clone role for ci_scripts
+  import_role:
+    name: git_clone
+  vars:
+    git_repo_url: "{{git_repo_url_ci_scripts}}"
+    branch: "{{branch_ci_scripts}}"
+    dest_repo: "{{ci_scripts_repo}}"
+  tags:
+    - clone_repo
+    - bps
+    - connectivity
+    - we
+
+# Clone cdp repository
+- name: import git_clone role for cdp
+  import_role:
+    name: git_clone
+  vars:
+    git_repo_url: "{{git_repo_url_cdp}}"
+    branch: "{{branch_cdp}}"
+    dest_repo: "{{cdp_repo}}"
+  tags:
+    - clone_repo
+    - bps
+    - connectivity
+    - we
+

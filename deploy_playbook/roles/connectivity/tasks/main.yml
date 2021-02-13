@@ -1,0 +1,205 @@
+# Execute commands to stop Connectivity
+- name: Stop Connectivity
+  shell: "./connectivityd stop"
+  args:
+    chdir: "{{ connectivity_base_software_directory }}/bin"
+  tags:
+    - connectivity
+
+# Check if connectPlusUniqueId.properties exists
+#- name: Check if connectPlusUniqueId.properties exists
+#  stat:
+#    path: "{{ connect_plus_unique_id_file }}"
+#  register: connect_plus_unique_id_file_result
+#  when: module == "pce" 
+#  tags:
+#    - connectivity
+
+# Backup connectPlusUniqueId.properties
+#- name: Backup connectPlusUniqueId.properties file
+#  copy:
+#    src: "{{ connect_plus_unique_id_file }}"
+#    dest: "{{ experian_directory }}/Backup/"
+#    remote_src: yes
+#  when: module == "pce" and connect_plus_unique_id_file_result.stat.exists
+#  tags:
+#    - connectivity
+
+ # Remove existing installation
+- name: clean up existing installation
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ connectivity_uninstall_list }}"
+  tags:
+    - connectivity
+
+- name: "Extract default Connectivity solution into {{ connectivity_solution }}"
+  unarchive:
+    #src: "{{ experian_directory }}/Backup/{{ version }}_Connectivity_Solution.zip"
+    src: "{{ experian_directory }}/Backup/1.8_Connectivity_Solution.zip"
+    dest: "{{ experian_directory }}"
+  tags:
+    - connectivity
+
+# Copy target package to connectivity solution folder
+- name: "copy target package to {{ connectivity_solution }}"
+  synchronize:
+    src: "{{ package_directory }}/{{ connectivity_target }}/"
+    dest: "{{ connectivity_solution }}"
+  tags:
+    - connectivity
+
+# Copy java keystore
+- name: Copy java keystore
+  copy:
+    src: "{{ item }}"
+    dest: "{{ connectivity_solution }}/key"
+    remote_src: yes
+  with_fileglob:
+    - "{{ connectivity_keystore_file }}"
+  tags:
+    - connectivity
+
+# Set db_name variable
+#- name: Set db_name variable
+#  set_fact:
+#    db_name: "{{ hostvars[inventory_hostname]['db_name'] | default(default_pce_db_name) }}"
+#  when: module == "pce" and not connect_plus_unique_id_file_result.stat.exists
+#  tags:
+#    - connectivity
+
+# Set runtime_db_host_input variable
+#- name: Set runtime_db_host_input variable
+#  set_fact:
+#    runtime_db_host_input: "{{ hostvars[inventory_hostname]['runtime_db_host_input'] }}"
+#  when: module == "pce" and not connect_plus_unique_id_file_result.stat.exists
+#  tags:
+#    - connectivity
+
+# Set runtime_db_host_port variable
+#- name: Set runtime_db_host_port variable
+#  set_fact:
+#    runtime_db_host_port: "{{ hostvars[inventory_hostname]['runtime_db_host_port'] | default(default_pce_db_port) }}"
+#  when: module == "pce" and not connect_plus_unique_id_file_result.stat.exists
+#  tags:
+#    - connectivity
+
+# Obtain latest ConnectPlusUniqueIdSequence
+#- name: Obtain latest ConnectPlusUniqueIdSequence
+#  shell: "{{ sqlcmd }} -S {{ runtime_db_host_input }},{{ runtime_db_host_port }} -d {{ db_name }} -h -1 -Q {{ connect_plus_query }}"
+#  register: connect_plus_unique_id_sequence_result
+#  when: module == "pce" and not connect_plus_unique_id_file_result.stat.exists
+#  tags:
+#    - connectivity
+
+# Set connect_plus_unique_id_sequence variable
+#- name: Set connect_plus_unique_id_sequence variable
+#  set_fact:
+#    connect_plus_unique_id_sequence: "{{ connect_plus_unique_id_sequence_result.stdout | trim }}"
+#  when: module == "pce" and not connect_plus_unique_id_file_result.stat.exists and connect_plus_unique_id_sequence_result.stdout != ''
+#  tags:
+#    - connectivity
+
+# Set date_time variable
+#- name: Set date_time variable
+#  set_fact:
+#    date_time: "{{ lookup('pipe', 'date +%a_%b_%d_%H:%M:%S_%Z_%Y') | replace('_',' ') }}"
+#  when: module == "pce" and not connect_plus_unique_id_file_result.stat.exists
+#  tags:
+#    - connectivity
+
+# Create new connectPlusUniqueId.properties file if it does not exist
+#- name: Create new connectPlusUniqueId.properties file if it does not exist
+#  template:
+#    src: "connectPlusUniqueId.properties.template"
+#    dest: "{{ connect_plus_unique_id_file }}"
+#  when: module == "pce" and not connect_plus_unique_id_file_result.stat.exists
+#  tags:
+#    - connectivity
+
+# Restore connectPlusUniqueId.properties
+#- name: Restore connectPlusUniqueId.properties file
+#  copy:
+#    src: "{{ experian_directory }}/Backup/connectPlusUniqueId.properties"
+#    dest: "{{ connect_plus_unique_id_file }}"
+#    remote_src: yes
+#  when: module == "pce" and connect_plus_unique_id_file_result.stat.exists
+#  tags:
+#    - connectivity
+
+# Copy customEx jar file to connectivity lib/core directory
+- name: Copy customEx jar file to connectivity lib/core directory
+  copy:
+    remote_src: True
+    src: "{{ item }}"
+    dest: "{{ connectivity_base_software_directory }}/lib/core"
+  with_fileglob:
+    - "{{ connectivity_solution }}/clientlib/customEx*"
+  when: module == "pco"
+  tags:
+    - connectivity
+
+# Remove customEx jar file from connectivity solution clientlib directory
+- name: Remove customEx jar file from connectivity solution clientlib directory
+  file: 
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "{{ connectivity_solution }}/clientlib/customEx*"
+  when: module == "pco"
+  tags:
+    - connectivity
+
+# Create {{ connectivity_solution }}/pce_logging directory used for storing failed asynchronous tasks
+- name: "create {{ connectivity_solution }}/pce_logging directory"
+  file:
+    path: "{{ connectivity_solution }}/pce_logging"
+    state: directory
+    recurse: yes
+  tags:
+    - connectivity
+
+# Needs to be added to packaging
+- name: Copy TDPD.ser file
+  copy:
+    src: "{{ experian_directory }}/{{ tdpd_ser_file }}"
+    dest: "{{ connectivity_solution }}/conf/system/{{ tdpd_ser_file }}"
+  when: module == "pco"
+  tags:
+    - connectivity
+
+# Start Connectivity Service
+- name: Start Connectivity
+  shell: "./connectivityd start"
+  args:
+    chdir: "{{ connectivity_base_software_directory }}/bin"
+  tags:
+    - connectivity
+
+# Search for errors in Error.log file
+- name: "search for errors in {{ error_log_file }}"
+  shell: "grep -i 'ERROR' {{ error_log_file }}"
+  register: string_presence
+  failed_when: '"ERROR" in string_presence.stdout'
+  until: string_presence.rc == 0
+  retries: 6
+  delay: 10
+  tags:
+    - connectivity
+
+# Check if catalina.sh exists
+- name: Check is catalina.sh exists
+  stat:
+    path: "{{ tomcat_directory }}/bin/catalina.sh"
+  register: stat_result
+  tags:
+    - connectivity
+
+# Start Tomcat Service
+- name: Start Apache Tomcat
+  shell: ". {{ ansible_env.HOME }}/.bashrc && {{ tomcat_directory }}/bin/startup.sh"
+  when: stat_result.stat.exists and "'bps' in ansible_run_tags and 'we' not in ansible_run_tags"
+  tags:
+    - connectivity
+

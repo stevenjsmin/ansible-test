@@ -1,0 +1,5 @@
+---
+
+- debug: msg="Artifact management on Jfrog - {{ ACTION }}"
+
+# TODO : Next time....

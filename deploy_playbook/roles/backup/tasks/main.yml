@@ -1,0 +1,59 @@
+---
+
+# Check if Backup folder exists
+- name: create Backup folder if it does not exist
+  file:
+    path: "{{ experian_directory }}/Backup"
+    state: directory
+    recurse: yes
+
+# Backup should happen using the package directory and backed up if the deployment is successful
+# Restore will then follow the same steps as a deployment using the backup file already generated
+
+- name: Check if folder exists
+  stat:
+    path: "{{ deployed_directory }}"
+  register: deployed_result
+
+# Copy Deployed folder to Backup folder
+- name: Copy Deployed Folder
+  copy:
+    src: "{{ deployed_directory }}"
+    dest: "{{ backup_directory }}"
+    remote_src: yes
+  when: deployed_result.stat.exists and deployed_result.stat.isdir
+
+- name: Check if folder exists
+  stat:
+    path: "{{ enrichment_solution_directory }}"
+  register: enrichment_result
+
+# Copy Enrichment Solutions folder to Backup folder
+- name: Copy Enrichment Solutions Folder
+  copy:
+    src: "{{ enrichment_solution_directory }}"
+    dest: "{{ backup_directory }}"
+    remote_src: yes
+  when: enrichment_result.stat.exists and enrichment_result.stat.isdir
+
+# Check if conf folder exists
+- name: Check if folder exists
+  stat:
+    path: "{{ conf_directory }}"
+  register: conf_result
+
+# Copy Conf folder to Backup folder
+- name: Copy Conf Folder
+  copy:
+    src: "{{ conf_directory }}"
+    dest: "{{ backup_directory }}"
+    remote_src: yes
+  when: conf_result.stat.exists and conf_result.stat.isdir
+
+# Create Backup folder of existing installation
+- name: "create a backup zip file for Backup folder"
+  archive:
+    path: "{{ backup_directory }}"
+    dest: "{{ solution_directory }}/backup{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}.zip"
+    format: zip
+  when: enrichment_result.stat.exists or deployed_result.stat.exists

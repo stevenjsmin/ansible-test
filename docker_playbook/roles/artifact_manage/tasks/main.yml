@@ -1,0 +1,10 @@
+---
+
+- include: "{{ playbook_dir }}/roles/artifact_manage/tasks/upload.yml"
+  when: ACTION == "upload"
+
+- include: "{{ playbook_dir }}/roles/artifact_manage/tasks/download.yml"
+  when: ACTION == "download"
+
+- include: "{{ playbook_dir }}/roles/artifact_manage/tasks/remove.yml"
+  when: ACTION == "remove"

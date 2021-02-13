@@ -1,0 +1,10 @@
+---
+
+- name: Notification for pipeline process status
+  hosts: "localhost"
+  roles:
+    - { role: common }
+    - { role: notifications }
+
+  vars_files:
+    - "{{ inventory_dir }}/group_vars/{{ MODULE }}/main.yml"

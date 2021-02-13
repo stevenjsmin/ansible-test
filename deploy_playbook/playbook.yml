@@ -1,0 +1,37 @@
+---
+- name: Package and Deploy
+  hosts: all
+  become: false
+
+  vars_prompt:
+    - name: "github_password"
+      prompt: "Enter github password"
+      private: yes
+    - name: "service_account_password"
+      prompt: "Enter service account password"
+      private: yes
+    - name: "artifactory_password"
+      prompt: "Enter Artifactory account password"
+      private: yes
+
+  environment:
+    JAVA_HOME: "{{ java_home }}"
+    JRE_HOME: "{{ jre_home }}"
+    PYTHONPATH: "{{ python_path }}"
+
+  roles:
+    - role: clone_repo
+    #- role: vault
+    - role: packaging
+    - role: bps
+      component: BPS
+      version: 1.9
+    - role: connectivity
+      component: Connectivity
+      version: 1.8
+    - role: we
+      component: WE
+      version: 1.9
+    - role: permissions
+    - role: newrelic
+

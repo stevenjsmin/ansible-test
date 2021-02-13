@@ -1,0 +1,36 @@
+---
+
+component: BPS
+module: "pce"
+version: 1.9
+tomcat_version: 8.5.31
+connectivity_version: 1.8
+
+bps_base_software_directory: "{{ powercurve_directory }}/business-process-server-v{{version}}"
+bps_solution_directory: "{{ experian_directory }}/BPS_Solution/Business_Process_Engine"
+bps_backup_directory: "{{ bps_solution_directory }}/Backup"
+
+tomcat_directory: "{{ powercurve_directory }}/apache-tomcat-{{ tomcat_version }}"
+connectivity_base_software_directory: "{{ powercurve_directory }}/connectivity-v{{ connectivity_version }}"
+
+service_pack: SP1
+hotfix_name: "Business Process Server v{{ version }} {{ service_pack }}"
+
+bps_uninstall_list:
+  - "{{ bps_solution_directory }}"
+  - "{{ bps_base_software_directory }}"
+#    - "{{ bps_solution_directory }}/Deploy"
+#    - "{{ bps_solution_directory }}/Deployed"
+#    - "{{ bps_solution_directory }}/Enrichment_Solutions"
+#    - "{{ bps_solution_directory }}/Business_Process_Flow"
+#    - "{{ bps_solution_directory }}/Entity_Model"
+#    - "{{ bps_solution_directory }}/Log"
+#    - "{{ bps_base_software_directory }}/cache"
+#    - "{{ bps_base_software_directory }}/logs"
+
+package_directory: "{{ git_repo_directory }}/cdp/{{ module }}/bps"
+
+custombps_file: "custombps-1.8.jar"
+
+kerberos_directory: "{{ experian_directory }}/kerberos"
+

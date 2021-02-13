@@ -1,0 +1,9 @@
+---
+
+- name: Run OC Apply command for Remove
+  shell: 'oc delete all -l app={{ MODULE | lower }}-pco'
+  register: openShiftCmdResult
+  ignore_errors: no
+
+
+- debug: var=openShiftCmdResult
