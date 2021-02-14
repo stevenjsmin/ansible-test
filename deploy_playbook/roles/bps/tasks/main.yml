@@ -9,6 +9,8 @@
     - bps
 
 #Stop the services in order starting with Tomcat
+#Stop the services in order starting with Tomcat
+#Stop the services in order starting with Tomcat
 - name: stop apache tomcat
   shell: "{{ tomcat_directory }}/bin/catalina.sh stop -force"
   when: stat_result.stat.exists
@@ -57,7 +59,7 @@
     path: "{{ bps_base_software_directory }}/conf/{{ item }}"
     dest: "{{ backup_directory }}/Test/{{ solution_version }}_{{ component }}_Test_Conf.zip"
     format: zip
-  with_items: 
+  with_items:
     - "*.conf"
     - "*.cfg"
     - "*.properties"
@@ -273,4 +275,3 @@
   when: "'connectivity' not in ansible_run_tags and 'we' not in ansible_run_tags"
   tags:
     - bps
-
